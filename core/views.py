@@ -171,3 +171,9 @@ def launch_tactic_efficiency(request):
             "success": False,
             "error": str(e)
         }, status=500)
+
+
+@login_required(login_url="login")
+def analytics(request):
+    """Render Analytics & Predictions page which lists available prediction models."""
+    return render(request, "analytics.html")

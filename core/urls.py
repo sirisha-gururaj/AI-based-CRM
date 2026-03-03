@@ -25,6 +25,7 @@ urlpatterns = [
     path("signup/", views.signup_view, name="signup"),
     path("logout/", views.logout_view, name="logout"),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("analytics/", views.analytics, name="analytics"),
     path("prediction/claim-cost/", views.launch_claim_cost_prediction, name="launch_claim_cost"),
     path("prediction/rebate/", views.launch_rebate_prediction, name="launch_rebate"),
     path("prediction/tactic-efficiency/", views.launch_tactic_efficiency, name="launch_tactic_efficiency"),
