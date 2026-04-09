@@ -1,5 +1,6 @@
 import calendar
 from datetime import date, datetime
+from random import random
 
 from django.db.models import Sum
 from django.shortcuts import render, get_object_or_404, redirect
@@ -447,7 +448,18 @@ def campaign_launch(request, pk):
         campaign.status = "ACTIVE"
         campaign.save()
         
-        # Generate dummy response data
+        # Automatically update leads to CONTACTED
+        if campaign.offer:
+            related_leads = Lead.objects.filter(
+                offer=campaign.offer,
+                status="NEW"
+            )
+
+            for lead in related_leads:
+                lead.status = "CONTACTED"
+                lead.save()
+
+        '''# Generate dummy response data
         dummy_names = ["John Smith", "Sarah Johnson", "Michael Brown", "Emily Davis", "Robert Wilson"]
         dummy_emails = ["john@example.com", "sarah@example.com", "michael@example.com", "emily@example.com", "robert@example.com"]
         dummy_statuses = ["ACCEPTED", "REJECTED", "PENDING", "ACCEPTED"]
@@ -464,7 +476,40 @@ def campaign_launch(request, pk):
                 status=dummy_statuses[i % len(dummy_statuses)],
                 notes=f"Response from {dummy_names[i]}"
             )
+        '''
         
+        # Get leads linked to this campaign's offer
+    if campaign.offer:
+        leads = Lead.objects.filter(
+        offer=campaign.offer,
+        status__in=["NEW", "CONTACTED"]
+    )
+
+    # Clear existing responses
+    campaign.responses.all().delete()
+
+    for lead in leads:
+        response_status = random.choice(["ACCEPTED", "REJECTED", "PENDING"])
+
+        # Create campaign response from real lead
+        CampaignResponse.objects.create(
+            campaign=campaign,
+            contact_name=lead.full_name(),
+            contact_email=lead.email if lead.email else "noemail@example.com",
+            status=response_status,
+            notes=f"Auto-generated response for {lead.full_name()}"
+        )
+
+        # Update lead status based on response
+        if response_status == "ACCEPTED":
+            lead.status = "QUALIFIED"
+        elif response_status == "REJECTED":
+            lead.status = "LOST"
+        else:
+            lead.status = "CONTACTED"
+
+        lead.save()
+
         messages.success(request, f"Campaign '{campaign.name}' launched successfully with 5 sample responses.")
         return redirect("marketing:campaign_detail", pk=campaign.pk)
     

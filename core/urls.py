@@ -15,20 +15,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import path, include
 from . import views
 
 
+def api_root(_request):
+    return JsonResponse(
+        {
+            "detail": "Django template UI is disabled. Use React UI on http://localhost:5173 and API under /api/."
+        }
+    )
+
+
 urlpatterns = [
-    path("", views.home, name="home"),
-    path("login/", views.login_view, name="login"),
-    path("signup/", views.signup_view, name="signup"),
-    path("logout/", views.logout_view, name="logout"),
-    path("dashboard/", views.dashboard, name="dashboard"),
-    path("analytics/", views.analytics, name="analytics"),
-    path("prediction/claim-cost/", views.launch_claim_cost_prediction, name="launch_claim_cost"),
-    path("prediction/rebate/", views.launch_rebate_prediction, name="launch_rebate"),
-    path("prediction/tactic-efficiency/", views.launch_tactic_efficiency, name="launch_tactic_efficiency"),
+    path("", api_root, name="api_root"),
+    path('api/auth/login/', views.api_login, name='api_login'),
+    path('api/auth/logout/', views.api_logout, name='api_logout'),
+    path('api/dashboard/', views.api_dashboard, name='api_dashboard'),
+    path('api/ai/subject-lines/', views.api_generate_subject_lines, name='api_subject_lines'),
+    path('api/prediction/claim-cost/', views.api_launch_claim_cost, name='api_claim_cost'),
+    path('api/prediction/rebate/', views.api_launch_rebate, name='api_rebate'),
+    path('api/prediction/tactic-efficiency/', views.api_launch_tactic_efficiency, name='api_tactic'),
+    path('api/', include('marketing.api_urls')),
     path("admin/", admin.site.urls),
-    path("", include("marketing.urls")),
 ]

@@ -86,16 +86,18 @@
                   {{ lead.company|default:"-" }}
                 </td>
                 <td>
-                  {% if lead.status == "new" %}
-                    <span class="badge text-bg-primary">New</span>
-                  {% elif lead.status == "working" %}
-                    <span class="badge text-bg-info text-dark">Working</span>
-                  {% elif lead.status == "qualified" %}
-                    <span class="badge text-bg-success">Qualified</span>
-                  {% else %}
-                    <span class="badge text-bg-secondary">Disqualified</span>
-                  {% endif %}
-                </td>
+  {% if lead.status == "NEW" %}
+    <span class="badge text-bg-primary">New</span>
+  {% elif lead.status == "CONTACTED" %}
+    <span class="badge text-bg-info text-dark">Contacted</span>
+  {% elif lead.status == "QUALIFIED" %}
+    <span class="badge text-bg-success">Qualified</span>
+  {% elif lead.status == "CONVERTED" %}
+    <span class="badge text-bg-dark">Converted</span>
+  {% elif lead.status == "LOST" %}
+    <span class="badge text-bg-danger">Lost</span>
+  {% endif %}
+</td>
                 <td>
                   {% if lead.rating == "hot" %}
                     <span class="badge text-bg-danger">Hot</span>

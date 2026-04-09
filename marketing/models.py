@@ -53,11 +53,12 @@ class Treatment(models.Model):
 
 class Lead(models.Model):
     STATUS_CHOICES = [
-        ("new", "New"),
-        ("working", "Working"),
-        ("qualified", "Qualified"),
-        ("disqualified", "Disqualified"),
-    ]
+    ("NEW", "New"),
+    ("CONTACTED", "Contacted"),
+    ("QUALIFIED", "Qualified"),
+    ("CONVERTED", "Converted"),
+    ("LOST", "Lost"),
+]
 
     SOURCE_CHOICES = [
         ("web", "Web form"),
@@ -91,7 +92,7 @@ class Lead(models.Model):
     city = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=100, blank=True)
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="NEW")
     source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default="web")
     rating = models.CharField(max_length=20, choices=RATING_CHOICES, default="warm")
 
@@ -111,6 +112,7 @@ class Lead(models.Model):
 
     notes = models.TextField(blank=True)
 
+    score = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -225,6 +227,8 @@ class Campaign(models.Model):
     end_date = models.DateField(null=True, blank=True)
     target_list = models.CharField(max_length=255, blank=True, help_text="Name or reference to target list")
     offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, blank=True, related_name="campaigns")
+    treatment = models.ForeignKey(Treatment, on_delete=models.SET_NULL, null=True, blank=True, related_name="campaigns")
+    import_contacts = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
