@@ -27,12 +27,17 @@ export default function LeadDetail() {
   const [lead, setLead] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isEditingNotes, setIsEditingNotes] = useState(false)
+  const [notesDraft, setNotesDraft] = useState('')
+  const [notesSaving, setNotesSaving] = useState(false)
+  const [notesError, setNotesError] = useState('')
 
   useEffect(() => {
     const loadLead = async () => {
       try {
         const data = await api.getLead(Number(id))
         setLead(data)
+        setNotesDraft(data?.notes || '')
       } catch (err: any) {
         if (err.response?.status === 401) navigate('/login')
         else setError('Failed to load lead')
@@ -52,6 +57,39 @@ export default function LeadDetail() {
       navigate('/leads')
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to delete lead')
+    }
+  }
+
+  const handleSaveNotes = async () => {
+    if (!lead) return
+    setNotesSaving(true)
+    setNotesError('')
+    try {
+      const payload = {
+        first_name: lead.first_name || '',
+        last_name: lead.last_name || '',
+        job_title: lead.job_title || '',
+        company: lead.company || '',
+        industry: lead.industry || '',
+        company_size: lead.company_size || '',
+        email: lead.email || '',
+        phone: lead.phone || '',
+        city: lead.city || '',
+        country: lead.country || '',
+        status: lead.status || 'NEW',
+        source: lead.source || 'web',
+        rating: lead.rating || 'warm',
+        owner: lead.owner || '',
+        offer: lead.offer || null,
+        notes: notesDraft,
+      }
+      const updated = await api.updateLead(lead.id, payload)
+      setLead(updated)
+      setIsEditingNotes(false)
+    } catch (err: any) {
+      setNotesError(err.response?.data?.detail || err.response?.data?.error || 'Failed to save notes')
+    } finally {
+      setNotesSaving(false)
     }
   }
 
@@ -114,8 +152,54 @@ export default function LeadDetail() {
           </div>
 
           <div>
-            <h2 className="text-sm font-semibold text-gray-700 mb-3">Notes</h2>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm leading-6 text-gray-800 whitespace-pre-wrap min-h-24">{lead.notes || 'No notes yet.'}</div>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h2 className="text-sm font-semibold text-gray-700">Notes</h2>
+              {!isEditingNotes ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditingNotes(true)}
+                  className="inline-flex items-center justify-center h-8 w-8 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                  +
+                </button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveNotes}
+                    disabled={notesSaving}
+                    className="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditingNotes(false)
+                      setNotesDraft(lead.notes || '')
+                      setNotesError('')
+                    }}
+                    className="px-3 py-1 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+            {isEditingNotes ? (
+              <div>
+                <textarea
+                  rows={5}
+                  value={notesDraft}
+                  onChange={(e) => setNotesDraft(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="Add notes about qualification and next action."
+                />
+                {notesError && <p className="mt-2 text-sm text-red-600">{notesError}</p>}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm leading-6 text-gray-800 whitespace-pre-wrap min-h-24">{lead.notes || 'No notes yet.'}</div>
+            )}
           </div>
         </div>
 

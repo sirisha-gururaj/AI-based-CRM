@@ -88,7 +88,7 @@ export default function Leads() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 overflow-x-hidden">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-primary">Leads</h1>
@@ -133,13 +133,6 @@ export default function Leads() {
             </option>
           ))}
         </select>
-        <input
-          type="search"
-          value={owner}
-          onChange={(e) => setOwner(e.target.value)}
-          placeholder="Owner"
-          className="px-3 py-2 rounded-lg border border-gray-300 text-sm w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
         <button
           type="button"
           onClick={() => {
@@ -161,7 +154,7 @@ export default function Leads() {
           <div className="text-center py-8 text-gray-500">Loading...</div>
         ) : leads.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full table-fixed text-sm">
               <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
                 <tr>
                   <th className="px-5 py-3 text-left font-medium">Lead</th>
@@ -169,7 +162,6 @@ export default function Leads() {
                   <th className="px-5 py-3 text-left font-medium">Status</th>
                   <th className="px-5 py-3 text-left font-medium">Rating</th>
                   <th className="px-5 py-3 text-left font-medium">Source</th>
-                  <th className="px-5 py-3 text-left font-medium">Owner</th>
                   <th className="px-5 py-3 text-left font-medium">Offer</th>
                   <th className="px-5 py-3 text-left font-medium">Campaign Response</th>
                   <th className="px-5 py-3 text-left font-medium">Updated</th>
@@ -181,7 +173,6 @@ export default function Leads() {
                   <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3.5">
                       <div className="font-semibold text-gray-800">{lead.full_name || `${lead.first_name || ''} ${lead.last_name || ''}`.trim()}</div>
-                      {lead.job_title && <div className="text-xs text-gray-500">{lead.job_title}</div>}
                     </td>
                     <td className="px-5 py-3.5 text-gray-600">{lead.company || '-'}</td>
                     <td className="px-5 py-3.5">
@@ -195,7 +186,6 @@ export default function Leads() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-gray-600">{lead.source_label || lead.source || '-'}</td>
-                    <td className="px-5 py-3.5 text-gray-600">{lead.owner || 'Unassigned'}</td>
                     <td className="px-5 py-3.5 text-gray-600">
                       {lead.offer ? (
                         <Link to={`/offers/${lead.offer}`} className="text-blue-600 hover:underline">
